@@ -1,32 +1,384 @@
-# React + TypeScript + Vite
+<div align="center">
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+<img src="https://img.shields.io/badge/BlueShield-SOC%20Dashboard-3B82F6?style=for-the-badge&logo=shield&logoColor=white" alt="BlueShield SOC Dashboard"/>
 
-Currently, two official plugins are available:
+# 🛡️ BlueShield SOC Dashboard
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### A Professional Security Operations Center (SOC) Monitoring Dashboard
 
-## React Compiler
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
+[![Vite](https://img.shields.io/badge/Vite-8.x-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev)
+[![TailwindCSS](https://img.shields.io/badge/Tailwind-4.x-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Wazuh](https://img.shields.io/badge/Wazuh-Ready-00BCD4?style=flat-square&logo=linux&logoColor=white)](https://wazuh.com)
+[![License](https://img.shields.io/badge/License-MIT-22C55E?style=flat-square)](LICENSE)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+> A fully responsive, dark-themed SOC dashboard built for cybersecurity Blue Teams. Designed to simulate and demonstrate enterprise-grade security monitoring — with real-time Wazuh SIEM integration support.
 
-## Expanding the Oxlint configuration
+</div>
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+---
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+## 📸 Dashboard Preview
+
+| Dashboard Overview | Security Events |
+|---|---|
+| Real-time KPI cards, 6 interactive charts, attack timeline | Full events table with search, filter, sort, pagination |
+
+| Incident Response | Threat Intelligence |
+|---|---|
+| 7-stage lifecycle workflow + active incident cards | Global threat map, CVEs, malware families, IOCs |
+
+---
+
+## 🏗️ System Architecture
+
+```mermaid
+graph TB
+    subgraph CLIENT["🖥️ BlueShield Frontend (React + Vite)"]
+        UI["Dashboard UI\n(8 Pages)"]
+        HOOK["useSOCData Hook\n(State Management)"]
+        CHARTS["Recharts\n(6 Chart Types)"]
+        EXPORT["Export Engine\njsPDF / html2canvas"]
+        UI --> HOOK
+        HOOK --> CHARTS
+        HOOK --> EXPORT
+    end
+
+    subgraph DATA["📊 Data Layer"]
+        MOCK["Mock Data Engine\n(500+ Events)"]
+        WAZUH_API["Wazuh REST API\nService Layer"]
+        PROXY["Vite Dev Proxy\n/wazuh-api/*"]
+    end
+
+    subgraph SIEM["🔒 Wazuh SIEM Stack (Production)"]
+        MANAGER["Wazuh Manager\nPort 55000"]
+        INDEXER["Wazuh Indexer\n(OpenSearch)"]
+        AGENTS["Wazuh Agents\n(Windows / Linux)"]
+        AGENTS -->|"Beats Port 1514"| MANAGER
+        MANAGER --> INDEXER
+    end
+
+    HOOK -->|"Development"| MOCK
+    HOOK -->|"Production"| WAZUH_API
+    WAZUH_API --> PROXY
+    PROXY -->|"HTTPS + JWT Auth"| MANAGER
+
+    style CLIENT fill:#0f172a,stroke:#3B82F6,color:#e2e8f0
+    style DATA fill:#0f172a,stroke:#22C55E,color:#e2e8f0
+    style SIEM fill:#0f172a,stroke:#EF4444,color:#e2e8f0
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+---
+
+## 🔄 Real-Time Data Flow
+
+```mermaid
+sequenceDiagram
+    participant A as 🪟 Windows Agent
+    participant M as 🖧 Wazuh Manager
+    participant API as 🔌 Wazuh REST API
+    participant P as 🔀 Vite Proxy
+    participant D as 🖥️ BlueShield Dashboard
+
+    Note over A,D: Agent Registration & Event Streaming
+
+    A->>M: Register agent (port 1514)
+    M-->>A: Agent ID confirmed ✅
+
+    loop Every 30 seconds (auto-refresh)
+        D->>P: GET /wazuh-api/security/user/authenticate
+        P->>API: POST /security/user/authenticate (Basic Auth)
+        API-->>P: JWT Token (15 min expiry)
+        P-->>D: JWT Token ✅
+
+        D->>P: GET /wazuh-api/alerts?limit=500
+        P->>API: Forwarded + Bearer Token
+        API->>M: Query alert database
+        M-->>API: Raw alert JSON
+        API-->>P: Alert data
+        P-->>D: Processed events
+
+        D->>D: Update KPI cards, charts, timeline
+        D->>D: 🔔 Toast new Critical/High alerts
+    end
+
+    Note over A,M: Live threat detection
+    A->>M: Failed login detected (rule 60122)
+    M->>M: Rule match → Alert generated
+    M-->>API: Alert indexed
+    D->>D: Next refresh picks up new alert
+```
+
+---
+
+## 🚨 Incident Response Workflow
+
+```mermaid
+flowchart LR
+    A([🔍 Detection]) -->|IOC Identified| B([🚨 Alert])
+    B -->|Triaged| C([🔬 Investigation])
+    C -->|RCA Complete| D([🛡️ Containment])
+    D -->|Spread Stopped| E([🗑️ Eradication])
+    E -->|Artifacts Removed| F([🔄 Recovery])
+    F -->|Systems Restored| G([📋 Closure])
+
+    A:::done
+    B:::done
+    C:::active
+    D:::pending
+    E:::pending
+    F:::pending
+    G:::pending
+
+    classDef done fill:#22C55E,stroke:#16a34a,color:#fff
+    classDef active fill:#3B82F6,stroke:#1d4ed8,color:#fff,stroke-width:3px
+    classDef pending fill:#1e3a5f,stroke:#334155,color:#94a3b8
+```
+
+---
+
+## 🔐 Authentication & Authorization Flow
+
+```mermaid
+flowchart TD
+    START([User Opens Dashboard]) --> CHECK{Wazuh\nConfigured?}
+
+    CHECK -->|No .env.local| MOCK[📊 Load Mock Data\n500 Simulated Events]
+    CHECK -->|Yes| AUTH[🔑 JWT Authentication\nPOST /security/user/authenticate]
+
+    AUTH --> TOKEN{Token\nReceived?}
+    TOKEN -->|❌ 401| RETRY[Try next user\nadmin → wazuh → wazuh-wui]
+    RETRY --> TOKEN
+
+    TOKEN -->|✅ Success| FETCH[📥 Fetch Live Data]
+    FETCH --> PARALLEL[["⚡ Parallel Requests"]]
+    PARALLEL --> ALERTS[GET /alerts\nlimit=500]
+    PARALLEL --> AGENTS[GET /agents]
+    PARALLEL --> RULES[GET /rules]
+    PARALLEL --> OVERVIEW[GET /overview/agents]
+
+    ALERTS --> PROCESS[🔄 Process & Normalize Data]
+    AGENTS --> PROCESS
+    RULES --> PROCESS
+    OVERVIEW --> PROCESS
+
+    PROCESS --> UI[🖥️ Update Dashboard UI]
+    MOCK --> UI
+
+    UI --> TIMER[⏱️ Wait 30 seconds]
+    TIMER --> REFRESH[🔄 Auto-Refresh]
+    REFRESH --> DIFF{New events\nsince last fetch?}
+    DIFF -->|Yes| TOAST[🔔 Toast Notification\nCritical / High alerts]
+    DIFF -->|No| UI2[🖥️ Silent Update]
+    TOAST --> UI
+    UI2 --> UI
+
+    style MOCK fill:#1e3a5f,stroke:#3B82F6,color:#e2e8f0
+    style AUTH fill:#0f172a,stroke:#22C55E,color:#e2e8f0
+    style PROCESS fill:#0f172a,stroke:#EAB308,color:#e2e8f0
+    style UI fill:#0f172a,stroke:#3B82F6,color:#e2e8f0
+```
+
+---
+
+## 🗂️ Project Structure
+
+```
+soc-blueshield/
+│
+├── 📁 src/
+│   ├── 📁 api/
+│   │   └── wazuhApi.ts          # Wazuh REST API client + JWT auth
+│   │
+│   ├── 📁 components/           # All UI components
+│   │   ├── Sidebar.tsx           # Navigation + system status
+│   │   ├── Topbar.tsx            # Clock, search, notifications
+│   │   ├── KPICards.tsx          # 6 animated KPI cards
+│   │   ├── ChartsSection.tsx     # 6 interactive Recharts
+│   │   ├── EventsTable.tsx       # Events grid (search/filter/sort)
+│   │   ├── IncidentResponse.tsx  # Incident management cards
+│   │   ├── IncidentWorkflow.tsx  # 7-stage lifecycle visualizer
+│   │   ├── ThreatIntel.tsx       # IOCs, CVEs, malware families
+│   │   ├── ActiveAgents.tsx      # Endpoint health monitoring
+│   │   ├── AttackTimeline.tsx    # Chronological event timeline
+│   │   ├── DetectionRules.tsx    # Rule management with toggles
+│   │   ├── AuthMonitoring.tsx    # Auth activity & failed logins
+│   │   ├── ExportFeatures.tsx    # CSV / PDF / PNG export
+│   │   ├── SettingsPage.tsx      # Dashboard configuration
+│   │   └── ToastContainer.tsx    # Animated alert notifications
+│   │
+│   ├── 📁 data/
+│   │   └── mockData.ts           # 500+ realistic security events
+│   │
+│   ├── 📁 hooks/
+│   │   ├── useSOCData.ts         # Mock data state + auto-refresh
+│   │   └── useWazuhData.ts       # Live Wazuh API state
+│   │
+│   └── 📁 utils/
+│       └── exportUtils.ts        # jsPDF + html2canvas exports
+│
+├── .env.local                    # Wazuh credentials (not committed)
+├── vite.config.ts                # Vite + Wazuh proxy config
+└── README.md
+```
+
+---
+
+## ⚙️ Tech Stack
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| **Framework** | React 19 + TypeScript | Component UI |
+| **Build Tool** | Vite 8 | Fast dev server + HMR |
+| **Styling** | Tailwind CSS v4 + Custom CSS | Dark SOC theme |
+| **Charts** | Recharts | Line, Bar, Donut, Radar, Pie |
+| **Animations** | Framer Motion | Page transitions, micro-animations |
+| **Icons** | Lucide React | 50+ security icons |
+| **PDF Export** | jsPDF | Incident report generation |
+| **PNG Export** | html2canvas | Dashboard snapshot |
+| **SIEM** | Wazuh REST API | Live security events (production) |
+
+---
+
+## 🚀 Quick Start
+
+### 1. Clone & Install
+
+```bash
+git clone https://github.com/nandish123-tech/soc-blueshield.git
+cd soc-blueshield
+npm install
+```
+
+### 2. Run (Mock Data — no server needed)
+
+```bash
+npm run dev
+# Open http://localhost:5173
+```
+
+### 3. Connect Real Wazuh (optional)
+
+Create `.env.local` in the project root:
+
+```env
+VITE_WAZUH_HOST=https://YOUR_WAZUH_MANAGER_IP
+VITE_WAZUH_PORT=55000
+VITE_WAZUH_USER=wazuh
+VITE_WAZUH_PASS=your_wazuh_api_password
+```
+
+> Find your Wazuh API password:
+> ```bash
+> sudo cat /etc/wazuh-passwords.txt
+> # Look for: api_username: 'wazuh'
+> ```
+
+---
+
+## 📊 Dashboard Pages
+
+| Page | Description | Key Features |
+|---|---|---|
+| **Dashboard** | Security overview | 6 KPI cards, 6 charts, attack timeline |
+| **Security Events** | Full event log | Search, filter, sort, paginate 500+ events |
+| **Incident Response** | Active incidents | 7-stage workflow, status updates |
+| **Threat Intelligence** | IOCs & threat actors | Countries, IPs, CVEs, malware families |
+| **Auth Monitoring** | Login tracking | 24h chart, failed login table |
+| **Active Agents** | Endpoint health | CPU/RAM bars, OS info, last seen |
+| **Reports** | Data export | CSV events, PDF incidents, PNG snapshot |
+| **Settings** | Configuration | Notifications, retention, display prefs |
+
+---
+
+## 🔗 Wazuh Integration Map
+
+```mermaid
+graph LR
+    subgraph WINDOWS["🪟 Windows Endpoint"]
+        WA["Wazuh Agent\n(Installed)"]
+    end
+
+    subgraph WAZUH["🖧 Wazuh Manager (Linux VM)"]
+        MGR["wazuh-manager\nservice"]
+        IDX["wazuh-indexer\n(OpenSearch)"]
+        DASH["wazuh-dashboard\n(Port 443)"]
+        API["wazuh-api\n(Port 55000)"]
+        MGR --> IDX
+        IDX --> DASH
+        MGR --> API
+    end
+
+    subgraph BLUESHIELD["🛡️ BlueShield Dashboard"]
+        BS["React App\nlocalhost:5173"]
+        PROXY["Vite Proxy\n/wazuh-api/*"]
+        BS --> PROXY
+    end
+
+    WA -->|"Syslog / Events\nPort 1514"| MGR
+    PROXY -->|"JWT Auth\nREST API"| API
+
+    style WINDOWS fill:#1e3a5f,stroke:#3B82F6,color:#e2e8f0
+    style WAZUH fill:#0f172a,stroke:#22C55E,color:#e2e8f0
+    style BLUESHIELD fill:#0f172a,stroke:#EAB308,color:#e2e8f0
+```
+
+---
+
+## 📈 Data Pipeline
+
+```mermaid
+flowchart LR
+    RAW["📡 Raw Wazuh Alert\nJSON from API"]
+    --> PARSE["🔄 Parse & Normalize\nwazuhApi.ts"]
+    --> MAP["🗺️ Map to SecurityEvent\ntimestamp, severity, category"]
+    --> FILTER["🔍 Apply Filters\nseverity, category, search"]
+    --> SORT["↕️ Sort\ntimestamp / severity"]
+    --> PAGE["📄 Paginate\n20 per page"]
+    --> RENDER["🖥️ Render Table\nEventTable.tsx"]
+
+    RAW2["📡 Raw Alert Array"]
+    --> AGG["📊 Aggregate\nbuildChartsFromAlerts()"]
+    --> CHART["📈 Render Charts\nChartsSection.tsx"]
+```
+
+---
+
+## ✨ Key Features
+
+- 🔴 **Live auto-refresh** every 30 seconds with new alert toast notifications
+- 📊 **6 interactive charts** — Line, Stacked Bar, Donut, Horizontal Bar, MITRE ATT&CK Radar, Pie
+- 🔍 **Real-time search & filter** across 500+ security events
+- 🗂️ **7-stage incident workflow** visualizer with animated stage indicators
+- 📥 **Export suite** — CSV (all events), PDF (per incident), PNG (dashboard snapshot)
+- 🌍 **Threat intelligence** — malicious IPs, CVEs, malware families, country heatmap
+- 🖥️ **Agent monitoring** — CPU, memory, OS, last seen, connection status
+- 🔔 **Animated toast notifications** with severity-colored alerts
+- ⚡ **Smooth page transitions** powered by Framer Motion
+- 🌙 **Full dark theme** with SOC-grade color palette
+
+---
+
+## 🔒 Security Note
+
+> ⚠️ **Never commit `.env.local`** to version control. It contains your Wazuh API credentials.
+> The `.gitignore` already excludes it by default.
+
+---
+
+## 👤 Author
+
+**Nandish** — Cybersecurity Blue Team Project
+
+[![GitHub](https://img.shields.io/badge/GitHub-nandish123--tech-181717?style=flat-square&logo=github)](https://github.com/nandish123-tech)
+
+---
+
+<div align="center">
+
+**BlueShield SOC Dashboard** — Built for Blue Teams 🛡️
+
+*Real-time security monitoring, incident response, and threat intelligence in one dashboard.*
+
+</div>
