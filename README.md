@@ -1,22 +1,25 @@
-<div align="center">
-
-<img src="https://img.shields.io/badge/BlueShield-SOC%20Dashboard-3B82F6?style=for-the-badge&logo=shield&logoColor=white" alt="BlueShield SOC Dashboard"/>
-
 # 🛡️ BlueShield SOC Dashboard
 
-### A Professional Security Operations Center (SOC) Monitoring Dashboard
+### Security Operations Center Dashboard for Blue Team Monitoring
 
-[![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
-[![Vite](https://img.shields.io/badge/Vite-8.x-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev)
-[![TailwindCSS](https://img.shields.io/badge/Tailwind-4.x-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
-[![Wazuh](https://img.shields.io/badge/Wazuh-Ready-00BCD4?style=flat-square&logo=linux&logoColor=white)](https://wazuh.com)
-[![License](https://img.shields.io/badge/License-MIT-22C55E?style=flat-square)](LICENSE)
+A modern, interactive Security Operations Center (SOC) dashboard designed to visualize security events, monitor endpoints, support incident response workflows, and provide threat intelligence insights.
 
-> A fully responsive, dark-themed SOC dashboard built for cybersecurity Blue Teams. Designed to simulate and demonstrate enterprise-grade security monitoring — with real-time Wazuh SIEM integration support.
+Built with React and TypeScript, BlueShield supports simulated security data for demonstration and a Wazuh SIEM integration for live security monitoring.
+
+<div align="center">
+
+![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8.x-646CFF?style=flat-square&logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
+![Wazuh](https://img.shields.io/badge/Wazuh-SIEM_Integration-00BCD4?style=flat-square&logo=linux&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-22C55E?style=flat-square)
 
 </div>
 
+---
+
+Designed to demonstrate security monitoring, alert visualization, endpoint awareness, threat investigation, and incident handling in a unified dashboard.
 ---
 
 ## 📸 Dashboard Preview
@@ -243,54 +246,60 @@ soc-blueshield/
 
 ## 🚀 Quick Start
 
-### 1. Clone & Install
+### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/nandish123-tech/soc-blueshield.git
+git clone https://github.com/nani-arise/soc-blueshield.git
 cd soc-blueshield
+```
+
+### 2. Install Dependencies
+
+```bash
 npm install
 ```
 
-### 2. Run (Mock Data — no server needed)
+### 3. Start the Development Server
 
 ```bash
 npm run dev
-# Open http://localhost:5173
 ```
 
-### 3. Connect Real Wazuh (optional)
+Open your browser and navigate to:
 
-Create `.env.local` in the project root:
+```text
+http://localhost:5173
+```
+
+The dashboard starts in **Mock Data Mode**, allowing you to explore the interface without configuring a Wazuh server.
+
+### 4. Connect to Wazuh (Optional)
+
+To enable live security monitoring, configure your Wazuh connection using the environment variables supported by the project.
 
 ```env
 VITE_WAZUH_HOST=https://YOUR_WAZUH_MANAGER_IP
 VITE_WAZUH_PORT=55000
-VITE_WAZUH_USER=wazuh
-VITE_WAZUH_PASS=your_wazuh_api_password
+VITE_WAZUH_USER=your_username
+VITE_WAZUH_PASS=your_password
 ```
 
-> Find your Wazuh API password:
-> ```bash
-> sudo cat /etc/wazuh-passwords.txt
-> # Look for: api_username: 'wazuh'
-> ```
+> **Security:** Never commit real credentials or environment files containing secrets to GitHub.
 
----
+## 📊 Dashboard Modules
 
-## 📊 Dashboard Pages
-
-| Page | Description | Key Features |
+| Module | Description | Capabilities |
 |---|---|---|
-| **Dashboard** | Security overview | 6 KPI cards, 6 charts, attack timeline |
-| **Security Events** | Full event log | Search, filter, sort, paginate 500+ events |
-| **Incident Response** | Active incidents | 7-stage workflow, status updates |
-| **Threat Intelligence** | IOCs & threat actors | Countries, IPs, CVEs, malware families |
-| **Auth Monitoring** | Login tracking | 24h chart, failed login table |
-| **Active Agents** | Endpoint health | CPU/RAM bars, OS info, last seen |
-| **Reports** | Data export | CSV events, PDF incidents, PNG snapshot |
-| **Settings** | Configuration | Notifications, retention, display prefs |
+| **Dashboard Overview** | Centralized security overview | KPI cards, charts, attack timeline |
+| **Security Events** | Security event investigation | Search, filtering, sorting, pagination |
+| **Incident Response** | Incident tracking and investigation | Incident status management, 7-stage workflow |
+| **Threat Intelligence** | Threat data visualization | IOCs, IP intelligence, CVEs, malware insights |
+| **Authentication Monitoring** | Login activity analysis | Failed logins, authentication activity |
+| **Endpoint Monitoring** | Wazuh agent visibility | Agent status, OS information, resource monitoring |
+| **Reports & Export** | Security data reporting | CSV, PDF, PNG exports |
+| **Settings** | Dashboard configuration | Notification and display preferences |
 
----
+
 
 ## 🔗 Wazuh Integration Map
 
@@ -345,40 +354,88 @@ flowchart LR
 
 ---
 
+## 🔒 Security & Credential Management
+
+BlueShield uses environment variables to configure its Wazuh integration.
+
+### Security Guidelines
+
+- Never commit `.env.local` or files containing credentials to GitHub.
+- Store API usernames and passwords securely.
+- Use dedicated credentials for integrations whenever possible.
+- Avoid exposing Wazuh API access to untrusted networks.
+- Restrict access to your Wazuh Manager according to your environment's security requirements.
+
+### Configuration
+
+The `.env.local` file is intended for local configuration and should remain excluded from version control.
+
+> This project is intended for educational purposes and security monitoring demonstrations. Always configure integrations securely before connecting to a real infrastructure.
+
 ## ✨ Key Features
 
-- 🔴 **Live auto-refresh** every 30 seconds with new alert toast notifications
-- 📊 **6 interactive charts** — Line, Stacked Bar, Donut, Horizontal Bar, MITRE ATT&CK Radar, Pie
-- 🔍 **Real-time search & filter** across 500+ security events
-- 🗂️ **7-stage incident workflow** visualizer with animated stage indicators
-- 📥 **Export suite** — CSV (all events), PDF (per incident), PNG (dashboard snapshot)
-- 🌍 **Threat intelligence** — malicious IPs, CVEs, malware families, country heatmap
-- 🖥️ **Agent monitoring** — CPU, memory, OS, last seen, connection status
-- 🔔 **Animated toast notifications** with severity-colored alerts
-- ⚡ **Smooth page transitions** powered by Framer Motion
-- 🌙 **Full dark theme** with SOC-grade color palette
+### 📊 Security Monitoring & Dashboard
+- Security overview with 6 KPI cards
+- Interactive charts for security event visualization
+- Attack activity timeline
+- Automated dashboard refresh every 30 seconds
 
----
+### 🚨 Security Event Management
+- Centralized view of security events
+- Search, filtering, sorting, and pagination
+- Monitoring of 500+ simulated events
+- Severity-based event visualization
 
-## 🔒 Security Note
+### 🔍 Incident Response
+- Interactive 7-stage incident response workflow
+- Incident investigation and status tracking
+- Visual incident lifecycle management
 
-> ⚠️ **Never commit `.env.local`** to version control. It contains your Wazuh API credentials.
-> The `.gitignore` already excludes it by default.
+### 🌍 Threat Intelligence
+- Threat indicators and malicious IP visualization
+- CVE information and malware family insights
+- Geographic threat visualization
 
----
+### 🖥️ Endpoint Monitoring
+- Wazuh agent health and connection status
+- Endpoint OS information
+- CPU, memory, and last-seen monitoring
 
-## 👤 Author
+### 🔐 Authentication Monitoring
+- Login activity visualization
+- Failed authentication tracking
+- Authentication event analysis
 
-**Nandish** — Cybersecurity Blue Team Project
+### 📥 Reporting & Export
+- Export security events to CSV
+- Generate incident reports in PDF
+- Export dashboard snapshots in PNG
 
-[![GitHub](https://img.shields.io/badge/GitHub-nandish123--tech-181717?style=flat-square&logo=github)](https://github.com/nandish123-tech)
+### 🔔 Notifications & UI
+- Severity-based alert notifications
+- Animated page transitions
+- Responsive dark-themed interface
+
+### 🔗 SIEM Integration
+- Wazuh REST API integration
+- JWT-based API authentication
+- Simulated data mode for demonstrations
+- Live monitoring mode when Wazuh is configured
+
+
+## 👨‍💻 Author
+
+**Y S Nandish**  
+Cybersecurity Engineering Student | Blue Team & Security Monitoring
+
+Interested in SIEM, SOC operations, threat detection, incident response, Linux, and cybersecurity research.
+
+- GitHub: [@nani-arise](https://github.com/nani-arise)
 
 ---
 
 <div align="center">
 
-**BlueShield SOC Dashboard** — Built for Blue Teams 🛡️
-
-*Real-time security monitoring, incident response, and threat intelligence in one dashboard.*
+*Built with ❤️ for cybersecurity learning and defensive security.*
 
 </div>
