@@ -17,22 +17,6 @@ Built with React and TypeScript, BlueShield supports simulated security data for
 
 </div>
 
----
-
-Designed to demonstrate security monitoring, alert visualization, endpoint awareness, threat investigation, and incident handling in a unified dashboard.
----
-
-## 📸 Dashboard Preview
-
-| Dashboard Overview | Security Events |
-|---|---|
-| Real-time KPI cards, 6 interactive charts, attack timeline | Full events table with search, filter, sort, pagination |
-
-| Incident Response | Threat Intelligence |
-|---|---|
-| 7-stage lifecycle workflow + active incident cards | Global threat map, CVEs, malware families, IOCs |
-
----
 
 ## 🏗️ System Architecture
 
